@@ -81,11 +81,48 @@ WriteResult({ "nInserted" : 1 })
 })
 WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
 
-### Добавление значений в списов $addToSet/$push
+### Добавление значений в список $addToSet/$push
 
 > db.users.update({name:"A"}, {
 	$addToSet:{
 		"favourites.movies":"Rambo"
 	}
 })
+
+> db.users.update({name:"A"}, {
+	$push:{
+		"favourites.movies":"Rambo"
+	}
+})
+
+### Удаление записей
+
+> db.users.remove({name:"A"})
+
+### Удаление коллекций 
+
+> db.users.drop()
+
+### Добавление записей
+
+> 	for (var i = 0; i < 200000; i++) {
+...		db.numbers.save({num:i})
+... }
+
+### Поиск в диапазоне значений
+
+> db.numbers.find({$gt:199995, $lt:199999})
+
+### Простой Индекс
+
+> db.numbers.find({num:{$gt:199995}}).explain()
+> db.numbers.ensureIndex({num:1})
+> db.numbers.getIndexes()
+
+### Информация об объектах
+
+> show dbs
+> show collections
+> db.stats()
+> db.users.stats()
 
