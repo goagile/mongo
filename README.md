@@ -126,3 +126,12 @@ WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
 > db.stats()
 > db.users.stats()
 
+### Команды "под капотом"
+
+> db.stats()
+> db.runCommand({dbstats:1})
+> db.$cmd.findOne({dbstats:1})
+
+> db.users.stats()
+> db.runCommand({collstats:"users"})
+> db.$cmd.findOne({collstats:"users"})
