@@ -6,7 +6,6 @@ import (
 	"log"
 
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -38,13 +37,12 @@ func main() {
 	//
 	fedor := bson.M{
 		"name": "Fedor",
-		"age":  42,
 		"favourites": bson.M{
 			"movies": bson.A{"Rambo"},
 		},
 	}
-	r, _ := users.InsertOne(context.TODO(), fedor)
-	fedorID := r.InsertedID
+	inserted, _ := users.InsertOne(context.TODO(), fedor)
+	fmt.Println("Inserted: ", inserted)
 
 	//
 	// Update
@@ -62,23 +60,31 @@ func main() {
 	//
 	var foundOne bson.M
 	f := users.FindOne(context.TODO(), bson.M{
-		"_id": fedorID.(primitive.ObjectID),
+		"_id": inserted.InsertedID,
 	})
 	f.Decode(&foundOne)
-	fmt.Println("foundOne by id (not updated):", foundOne)
+	fmt.Println("foundOne by id (updated):", foundOne)
 
 	f = users.FindOne(context.TODO(), bson.M{
 		"name": "Fedor",
 	})
 	f.Decode(&foundOne)
 	fmt.Println("foundOne by name:", foundOne)
-	fmt.Println("_id", foundOne["_id"].(primitive.ObjectID).Hex())
+	fmt.Println("_id", foundOne["_id"])
+
+	//
+	// Count Documents
+	//
+	c, _ := users.CountDocuments(context.TODO(), bson.M{
+		"name": "Fedor",
+	})
+	fmt.Println("Count:", c)
 
 	//
 	// Delete One
 	//
-	// dr, _ := users.DeleteOne(context.TODO(), bson.M{
-	// 	"name": "Fedor",
-	// })
-	// fmt.Printf("%#v\n", dr)
+	dr, _ := users.DeleteOne(context.TODO(), bson.M{
+		"name": "Fedor",
+	})
+	fmt.Printf("%#v\n", dr)
 }
