@@ -80,6 +80,8 @@ func FindByTitle(title string) (*Post, error) {
 	if err != nil {
 		return nil, fmt.Errorf("Collection.Find:%v", err)
 	}
+	defer cursor.Close(ctx)
+
 	var posts []*Post
 	if err := cursor.All(ctx, &posts); err != nil {
 		return nil, fmt.Errorf("cursor.All:%v", err)

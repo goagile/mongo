@@ -38,7 +38,6 @@ func main() {
 	defer client.Disconnect(ctx)
 
 	DB = client.Database("tutorial")
-
 	post.Collection = DB.Collection("posts")
 
 	p := post.New("XXX", "To many text ...")
