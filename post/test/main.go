@@ -15,17 +15,14 @@ var (
 	DBTimeout = 10 * time.Second
 	DBURI     = "mongodb://127.0.0.1:27017"
 	DB        *mongo.Database
+	DBClient  *mongo.Client
 )
 
-func main() {
-	opts := options.Client().ApplyURI(DBURI)
-
-	client, err := mongo.NewClient(opts)
+func DBConnectClient(ctx context.Context) *mongo.Client {
+	client, err := mongo.NewClient(options.Client().ApplyURI(DBURI))
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	ctx, _ := context.WithTimeout(context.Background(), DBTimeout)
 
 	if err := client.Connect(ctx); err != nil {
 		log.Fatal()
@@ -35,22 +32,21 @@ func main() {
 		log.Fatal(err)
 	}
 
-	defer client.Disconnect(ctx)
+	return client
+}
 
-	DB = client.Database("tutorial")
+func main() {
+	ctx, _ := context.WithTimeout(context.Background(), DBTimeout)
+	DBClient := DBConnectClient(ctx)
+	defer DBClient.Disconnect(ctx)
+
+	DB = DBClient.Database("tutorial")
 	post.Collection = DB.Collection("posts")
 
 	p := post.New("XXX", "To many text ...")
 	if err := p.Save(); err != nil {
 		log.Fatal(err)
 	}
-	// fmt.Println(p)
-
-	// p2, err := post.Find(p.ID)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// fmt.Println(p2)
 
 	p2, err := post.FindByTitle(p.Title)
 	if err != nil {
